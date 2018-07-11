@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Exemplo do uso para o i18next</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="dropdown">
+       <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span id="btnChngLeng">Change the lenguage</span>
+       <span class="caret"></span></button>
+       <ul class="dropdown-menu">
+         <li><a href="#" onclick="i18next.changeLanguage('en')">english</a></li>
+         <li><a href="#" onclick="i18next.changeLanguage('de')">german</a></li>
+         <li><a href="#" onclick="i18next.changeLanguage('pt')">portugues</a></li>
+         <li><a href="#" onclick="i18next.changeLanguage('sp')">spanish</a></li>
+         <li><a href="#" onclick="i18next.changeLanguage('fr')">french</a></li>
+       </ul>
+     </div>
+        <h1 id="wellcome" ></h1>
+        <p>
+            <span id="output" />Hello</span>
+        </p>
+        <p>
+            <strong id="interpolation" /></strong>
+        </p>
+
+        <small id="date"></small> -
+        <small id="upper"></small>
+
+        <br>
+          <div id="info"></div>
+        <br>
+
+        <input type="text" id="myNumber" placeholder="Quantity">
+
+    </div>
+  </div>
+</body>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="js/src/i18next.js"></script>
+<script src="https://unpkg.com/i18next-xhr-backend/i18nextXHRBackend.js"></script>
+<script src="https://unpkg.com/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.js"></script>
+<script src="js/src/moment.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
+
+<script>// import i18next from 'i18next';
+
+i18next
+.use(i18nextXHRBackend)
+.use(i18nextBrowserLanguageDetector)
+.init({
+  debug: true,
+  fallbackLng: 'pt',
+  interpolation: {
+    format: function(value, format, lng) {
+        if (format === 'uppercase') return value.toUpperCase();
+        if(value instanceof Date) return moment(value).format(format);
+        return value;
+    }
+  },
+  resources: {
+    en: {
+      translation: {
+
+        "msg": "Hello.",
+        "wellcome": "Wellcome.",
+        "Author": "Author: {{author.name}}",
+        "key": "The current date is: {{date, MM-DD-YYYY}}",
+        "key2": "{{text, uppercase}} just uppercased",
+        "buttons": {
+            "btnChngLeng": "Change the language"
+        },
+
+        "tree": {
+            "res": "added {{something}}"
+        }
+
+      }
+    },
+    de: {
+      translation: {
+        "msg": "Hello.",
+        "wellcome": "Willkommen.",
+        "Author": "Autor: {{author.name}}",
+        "key": "Das aktuelle Datum ist: {{date, MM-DD-YYYY}}",
+        "key2": "{{text, uppercase}} just uppercased",
+        "buttons": {
+            "btnChngLeng": "Ändere die Sprache"
+        },
+        "tree": {
+            "res": "hinzugefügt {{something}}"
+        }
+      }
+    },
+    pt: {
+      translation: {
+        "msg": "Olá.",
+        "wellcome": "Bem vindo.",
+        "Author": "Autor: {{author.name}}",
+        "key": "A data atual é: {{date, DD/MM/YYYY, h:mm:ss a}}",
+        "key2": "{{text, uppercase}} just uppercased",
+        "buttons": {
+            "btnChngLeng": "Alterar o idioma"
+        },
+        "tree": {
+            "res": "adicionado {{something}}"
+        }
+      }
+    },
+    sp: {
+      translation: {
+        "msg": "Hola.",
+        "wellcome": "Bienvenido.",
+        "Author": "Autor: {{author.name}}",
+        "key": "La fecha actual es: {{date, MM/DD/YYYY}}",
+        "key2": "{{text, uppercase}} just uppercased",
+        "buttons": {
+            "btnChngLeng": "Cambia el idioma"
+        },
+        "tree": {
+            "res": "adicional {{something}}"
+        }
+      }
+    },
+    fr: {
+      translation: {
+        "msg": "Bonjour",
+        "wellcome": "Bienvenu.",
+        "Author": "Auteur: {{author.name}}",
+        "key": "La date actuelle est: {{date, MM/DD/YYYY}}",
+        "key2": "{{text, uppercase}} just uppercased",
+        "buttons": {
+            "btnChngLeng": "Changer la langue"
+        },
+        "tree": {
+            "res": "ajoutée {{something}}"
+        }
+      }
+    }
+
+  }
+}, function(err, t) {
+  // init set content
+  updateContent();
+});
+
+function updateContent() {
+  const author = {
+    name : "Caio",
+    lastname  : "Ibraim"
+  };
+
+  document.getElementById('output').innerHTML         = i18next.t('msg');
+  document.getElementById('wellcome').innerHTML       = i18next.t('wellcome');
+  document.getElementById('interpolation').innerHTML  = i18next.t('Author', {author});
+  document.getElementById('date').innerHTML           = i18next.t('key', { date: new Date() });
+  document.getElementById('upper').innerHTML          = i18next.t('key2', { text: 'can you hear me' });
+
+  //working
+  var t =i18next.t('tree', { returnObjects: true, something: 'gold' });
+  document.getElementById("myNumber").placeholder = t.res;
+
+
+  //buttons
+  var t =i18next.t('buttons', { returnObjects: true});
+  document.getElementById('btnChngLeng').innerHTML  = t.btnChngLeng;
+
+
+
+  document.getElementById('info').innerHTML = `detected user language: "${i18next.language}"  --> loaded languages: "${i18next.languages.join(', ')}"`;
+}
+
+function changeLng(lng) {
+  i18next.changeLanguage(lng);
+}
+
+i18next.on('languageChanged', () => {
+  updateContent();
+});
+</script>
+</html>
